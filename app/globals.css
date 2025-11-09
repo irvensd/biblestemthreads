@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  @apply bg-navy text-secondary font-body antialiased;
+}
+
+main {
+  @apply min-h-screen bg-navy;
+}
+
+a {
+  @apply transition-colors duration-200;
+}
+
