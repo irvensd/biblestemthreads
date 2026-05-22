@@ -1,25 +1,32 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/NavBar";
 import { Footer } from "@/components/Footer";
+import { Providers } from "@/components/Providers";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "BibleStem Threads",
   description:
-    "Premium faith-inspired apparel that funds the BibleStem study ecosystem.",
+    "Premium Scripture-inspired apparel that helps fund free Bible studies through BibleStem.",
   metadataBase: new URL("https://biblestem.shop"),
   openGraph: {
     title: "BibleStem Threads",
     description:
-      "Faith-inspired apparel that keeps BibleStem studies free for everyone.",
+      "Faith you can wear. Studies you can support. Premium apparel that funds free Bible studies.",
     url: "https://biblestem.shop",
     siteName: "BibleStem Threads",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=1200&q=80",
+        url: "/products/seen-by-god-lineup.png",
         width: 1200,
-        height: 630,
-        alt: "BibleStem Threads apparel",
+        height: 1200,
+        alt: "Seen By God oversized tee by BibleStem Threads",
       },
     ],
     locale: "en_US",
@@ -28,7 +35,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "BibleStem Threads",
-    description: "Faith-inspired apparel that funds BibleStem studies.",
+    description: "Premium Scripture-inspired apparel that funds free Bible studies.",
   },
 };
 
@@ -38,13 +45,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="bg-navy text-secondary antialiased">
-        <NavBar />
-        <main className="bg-navy">{children}</main>
-        <Footer />
+    <html lang="en" className={inter.className}>
+      <body className="bg-white text-ink antialiased">
+        <Providers>
+          <NavBar />
+          <main>{children}</main>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
 }
-

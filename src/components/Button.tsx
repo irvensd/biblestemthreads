@@ -2,6 +2,7 @@
 
 import { ButtonHTMLAttributes } from "react";
 import { buttonClasses, ButtonVariant } from "@/styles/button";
+import { cn } from "@/lib/utils";
 
 type ButtonProps = {
   variant?: ButtonVariant;
@@ -9,10 +10,6 @@ type ButtonProps = {
 
 export function Button({ variant = "primary", className, ...props }: ButtonProps) {
   return (
-    <button
-      className={buttonClasses(variant, className)}
-      {...props}
-    />
+    <button className={cn(buttonClasses(variant, className))} {...props} />
   );
 }
-

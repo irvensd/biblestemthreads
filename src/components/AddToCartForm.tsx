@@ -4,38 +4,66 @@ import { useState } from "react";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils";
 
+const MAX_QUANTITY = 10;
+
 type AddToCartFormProps = {
   sizes: string[];
-  productName: string;
 };
 
-export function AddToCartForm({ sizes, productName }: AddToCartFormProps) {
+export function AddToCartForm({ sizes }: AddToCartFormProps) {
   const [selectedSize, setSelectedSize] = useState<string>(sizes[0] ?? "");
   const [quantity, setQuantity] = useState<number>(1);
-  const [message, setMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleAddToCart = () => {
-    // TODO: Wire to Stripe or Shopify checkout session.
-    console.log("Add to cart", { productName, selectedSize, quantity });
-    setMessage(`${productName} added to cart.`);
-    setTimeout(() => setMessage(null), 2800);
+  const handleBuyNow = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ size: selectedSize, quantity }),
+      });
+
+      const data = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok) {
+        setError(data.error ?? "Something went wrong. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="mt-8 space-y-6">
       <div>
-        <p className="text-sm font-medium text-secondary/70">Select size</p>
-        <div className="mt-3 flex flex-wrap gap-3">
+        <p className="text-sm font-medium text-ink">Size</p>
+        <div className="mt-3 flex flex-wrap gap-2">
           {sizes.map((size) => (
             <button
               key={size}
               type="button"
               onClick={() => setSelectedSize(size)}
+              disabled={loading}
               className={cn(
-                "rounded-full border px-4 py-2 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2",
+                "min-w-[3rem] rounded-lg border px-4 py-2 text-sm font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
                 selectedSize === size
-                  ? "border-accent bg-accent text-white focus-visible:outline-accent"
-                  : "border-secondary/30 text-secondary/70 hover:border-secondary hover:text-secondary"
+                  ? "border-ink bg-ink text-white focus-visible:outline-ink"
+                  : "border-border text-muted hover:border-ink/20 hover:text-ink focus-visible:outline-ink"
               )}
             >
               {size}
@@ -43,39 +71,47 @@ export function AddToCartForm({ sizes, productName }: AddToCartFormProps) {
           ))}
         </div>
       </div>
+
       <div>
-        <p className="text-sm font-medium text-secondary/70">Quantity</p>
+        <p className="text-sm font-medium text-ink">Quantity</p>
         <div className="mt-3 flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-secondary/30 text-lg text-secondary hover:border-secondary"
+            onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+            disabled={loading || quantity <= 1}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-lg text-ink hover:border-ink/20 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Decrease quantity"
           >
-            –
+            −
           </button>
-          <span className="min-w-[2ch] text-center text-lg font-semibold text-white">
+          <span className="min-w-[2ch] text-center text-base font-medium text-ink">
             {quantity}
           </span>
           <button
             type="button"
-            onClick={() => setQuantity((q) => q + 1)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-secondary/30 text-lg text-secondary hover:border-secondary"
+            onClick={() => setQuantity((value) => Math.min(MAX_QUANTITY, value + 1))}
+            disabled={loading || quantity >= MAX_QUANTITY}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-lg text-ink hover:border-ink/20 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Increase quantity"
           >
             +
           </button>
         </div>
       </div>
-      <Button className="w-full" onClick={handleAddToCart}>
-        Add to cart
+
+      <Button
+        className="w-full sm:w-auto sm:min-w-[220px]"
+        onClick={handleBuyNow}
+        disabled={loading}
+      >
+        {loading ? "Redirecting..." : "Buy now"}
       </Button>
-      {message && (
-        <div className="rounded-xl border border-accent/40 bg-accent/20 px-4 py-3 text-sm text-white shadow-subtle">
-          {message}
-        </div>
+
+      {error && (
+        <p className="text-sm text-red-600" role="alert">
+          {error}
+        </p>
       )}
     </div>
   );
 }
-
