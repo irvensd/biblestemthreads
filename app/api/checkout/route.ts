@@ -4,11 +4,82 @@ import { getStripeClient } from "@/lib/stripe";
 import { getSiteUrl } from "@/lib/site-url";
 
 const VALID_SIZES = ["S", "M", "L", "XL", "XXL"] as const;
+const MAX_QUANTITY = 10;
 
 type ValidSize = (typeof VALID_SIZES)[number];
 
+type CheckoutItem = {
+  size: ValidSize;
+  quantity: number;
+};
+
 function isValidSize(value: unknown): value is ValidSize {
   return typeof value === "string" && VALID_SIZES.includes(value as ValidSize);
+}
+
+function isValidQuantity(value: unknown): value is number {
+  return (
+    typeof value === "number" &&
+    Number.isInteger(value) &&
+    value >= 1 &&
+    value <= MAX_QUANTITY
+  );
+}
+
+function parseCheckoutItems(body: unknown): CheckoutItem[] | null {
+  if (!body || typeof body !== "object") {
+    return null;
+  }
+
+  const payload = body as {
+    size?: unknown;
+    quantity?: unknown;
+    items?: unknown;
+  };
+
+  if (Array.isArray(payload.items)) {
+    if (payload.items.length === 0) {
+      return null;
+    }
+
+    const parsed: CheckoutItem[] = [];
+
+    for (const entry of payload.items) {
+      if (!entry || typeof entry !== "object") {
+        return null;
+      }
+
+      const { size, quantity } = entry as { size?: unknown; quantity?: unknown };
+
+      if (!isValidSize(size) || !isValidQuantity(quantity)) {
+        return null;
+      }
+
+      parsed.push({ size, quantity });
+    }
+
+    return parsed;
+  }
+
+  if (isValidSize(payload.size) && isValidQuantity(payload.quantity)) {
+    return [{ size: payload.size, quantity: payload.quantity }];
+  }
+
+  return null;
+}
+
+function buildOrderSummary(items: CheckoutItem[]) {
+  const sizes = items.map((item) => `${item.size}:${item.quantity}`).join(", ");
+  const totalQuantity = items.reduce((total, item) => total + item.quantity, 0);
+
+  return {
+    sizes,
+    totalQuantity: String(totalQuantity),
+    description:
+      items.length === 1
+        ? `Seen By God Oversized Tee — Size ${items[0].size}`
+        : `Seen By God Oversized Tee — ${sizes}`,
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -25,53 +96,41 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { size, quantity } = body;
+    const items = parseCheckoutItems(body);
 
-    if (!isValidSize(size)) {
+    if (!items) {
       return NextResponse.json(
-        { error: "Invalid size selected." },
-        { status: 400 }
-      );
-    }
-
-    if (
-      typeof quantity !== "number" ||
-      !Number.isInteger(quantity) ||
-      quantity < 1 ||
-      quantity > 10
-    ) {
-      return NextResponse.json(
-        { error: "Quantity must be between 1 and 10." },
+        { error: "Invalid checkout items." },
         { status: 400 }
       );
     }
 
     const stripe = getStripeClient();
+    const summary = buildOrderSummary(items);
 
     const orderMetadata = {
       product: "Seen By God Oversized Tee",
-      size,
-      quantity: String(quantity),
+      size: items.length === 1 ? items[0].size : "Multiple",
+      sizes: summary.sizes,
+      quantity: summary.totalQuantity,
     };
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
-      line_items: [
-        {
-          price: priceId,
-          quantity,
-        },
-      ],
+      line_items: items.map((item) => ({
+        price: priceId,
+        quantity: item.quantity,
+      })),
       metadata: orderMetadata,
       payment_intent_data: {
-        description: `Seen By God Oversized Tee — Size ${size}`,
+        description: summary.description,
         metadata: orderMetadata,
       },
       shipping_address_collection: {
         allowed_countries: ["US"],
       },
       success_url: `${siteUrl}/threads/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${siteUrl}/threads`,
+      cancel_url: `${siteUrl}/`,
     });
 
     if (!session.url) {

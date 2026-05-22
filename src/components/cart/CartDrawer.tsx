@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { useCart } from "@/components/cart/CartProvider";
 import { Button } from "@/components/Button";
@@ -14,6 +15,49 @@ export function CartDrawer() {
     removeItem,
     updateQuantity,
   } = useCart();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleCheckout = async () => {
+    if (items.length === 0) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            size: item.size,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      const data = (await response.json()) as { url?: string; error?: string };
+
+      if (!response.ok) {
+        setError(data.error ?? "Something went wrong. Please try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  };
 
   if (!isOpen) {
     return null;
@@ -89,7 +133,8 @@ export function CartDrawer() {
                           onClick={() =>
                             updateQuantity(item.productId, item.size, item.quantity - 1)
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-sm text-ink hover:border-ink/20"
+                          disabled={loading}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-sm text-ink hover:border-ink/20 disabled:opacity-50"
                           aria-label="Decrease quantity"
                         >
                           −
@@ -102,7 +147,8 @@ export function CartDrawer() {
                           onClick={() =>
                             updateQuantity(item.productId, item.size, item.quantity + 1)
                           }
-                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-sm text-ink hover:border-ink/20"
+                          disabled={loading || item.quantity >= 10}
+                          className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-sm text-ink hover:border-ink/20 disabled:opacity-50"
                           aria-label="Increase quantity"
                         >
                           +
@@ -111,7 +157,8 @@ export function CartDrawer() {
                       <button
                         type="button"
                         onClick={() => removeItem(item.productId, item.size)}
-                        className="text-xs text-muted transition hover:text-ink"
+                        disabled={loading}
+                        className="text-xs text-muted transition hover:text-ink disabled:opacity-50"
                       >
                         Remove
                       </button>
@@ -128,12 +175,18 @@ export function CartDrawer() {
             <span className="text-muted">Subtotal</span>
             <span className="font-semibold text-ink">${subtotal.toFixed(2)}</span>
           </div>
-          <Button className="mt-5 w-full" disabled={items.length === 0}>
-            Checkout
+          <Button
+            className="mt-5 w-full"
+            disabled={items.length === 0 || loading}
+            onClick={handleCheckout}
+          >
+            {loading ? "Redirecting..." : "Checkout"}
           </Button>
-          <p className="mt-3 text-center text-xs text-muted">
-            Checkout coming soon. Cart is saved for this session.
-          </p>
+          {error && (
+            <p className="mt-3 text-center text-xs text-red-600" role="alert">
+              {error}
+            </p>
+          )}
         </div>
       </aside>
     </>

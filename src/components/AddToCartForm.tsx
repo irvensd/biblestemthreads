@@ -1,24 +1,54 @@
 "use client";
 
 import { useState } from "react";
+import { useCart } from "@/components/cart/CartProvider";
 import { Button } from "@/components/Button";
 import { cn } from "@/lib/utils";
 
 const MAX_QUANTITY = 10;
 
 type AddToCartFormProps = {
+  productId: string;
+  productName: string;
+  price: number;
+  image: string;
   sizes: string[];
 };
 
-export function AddToCartForm({ sizes }: AddToCartFormProps) {
+export function AddToCartForm({
+  productId,
+  productName,
+  price,
+  image,
+  sizes,
+}: AddToCartFormProps) {
+  const { addItem } = useCart();
   const [selectedSize, setSelectedSize] = useState<string>(sizes[0] ?? "");
   const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [addedMessage, setAddedMessage] = useState<string | null>(null);
+
+  const handleAddToCart = () => {
+    setError(null);
+    setAddedMessage(null);
+
+    addItem({
+      productId,
+      name: productName,
+      price,
+      size: selectedSize,
+      image,
+      quantity,
+    });
+
+    setAddedMessage(`Size ${selectedSize} added to cart.`);
+  };
 
   const handleBuyNow = async () => {
     setLoading(true);
     setError(null);
+    setAddedMessage(null);
 
     try {
       const response = await fetch("/api/checkout", {
@@ -99,13 +129,29 @@ export function AddToCartForm({ sizes }: AddToCartFormProps) {
         </div>
       </div>
 
-      <Button
-        className="w-full sm:w-auto sm:min-w-[220px]"
-        onClick={handleBuyNow}
-        disabled={loading}
-      >
-        {loading ? "Redirecting..." : "Buy now"}
-      </Button>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <Button
+          variant="secondary"
+          className="w-full sm:w-auto sm:min-w-[160px]"
+          onClick={handleAddToCart}
+          disabled={loading}
+        >
+          Add to cart
+        </Button>
+        <Button
+          className="w-full sm:w-auto sm:min-w-[160px]"
+          onClick={handleBuyNow}
+          disabled={loading}
+        >
+          {loading ? "Redirecting..." : "Buy now"}
+        </Button>
+      </div>
+
+      {addedMessage && (
+        <p className="text-sm text-muted" role="status">
+          {addedMessage}
+        </p>
+      )}
 
       {error && (
         <p className="text-sm text-red-600" role="alert">

@@ -46,7 +46,13 @@ export function ProductPreviewSection() {
 
             <div className="mt-10 border-t border-border pt-10">
               <p className="text-2xl font-semibold text-ink">${featuredProduct.price}</p>
-              <AddToCartForm sizes={featuredProduct.sizes} />
+              <AddToCartForm
+                productId={featuredProduct.id}
+                productName={featuredProduct.name}
+                price={featuredProduct.price}
+                image={featuredProduct.image}
+                sizes={featuredProduct.sizes}
+              />
               <p className="mt-4 text-xs text-muted">
                 First release quantities will be limited.
               </p>

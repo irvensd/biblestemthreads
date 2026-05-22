@@ -11,7 +11,7 @@ export default function CheckoutSuccessPage() {
         Thank you for supporting BibleStem Threads. Your order helps fund free Bible
         studies through BibleStem.
       </p>
-      <Link href="/threads" className={buttonClasses("primary", "mt-10 inline-flex")}>
+      <Link href="/" className={buttonClasses("primary", "mt-10 inline-flex")}>
         Return to BibleStem Threads
       </Link>
     </div>

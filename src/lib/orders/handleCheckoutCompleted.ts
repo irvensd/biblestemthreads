@@ -3,6 +3,7 @@ type CheckoutSessionPayload = {
   metadata?: {
     product?: string;
     size?: string;
+    sizes?: string;
     quantity?: string;
   } | null;
   customer_details?: {
@@ -18,6 +19,7 @@ export async function handleCheckoutSessionCompleted(
 ) {
   const product = session.metadata?.product ?? "Unknown product";
   const size = session.metadata?.size ?? "Unknown size";
+  const sizes = session.metadata?.sizes ?? size;
   const quantity = session.metadata?.quantity ?? "1";
   const customerEmail = session.customer_details?.email ?? "No email";
   const amountTotal = session.amount_total ?? 0;
@@ -28,6 +30,7 @@ export async function handleCheckoutSessionCompleted(
     sessionId: session.id,
     product,
     size,
+    sizes,
     quantity,
     customerEmail,
     amountTotal,
