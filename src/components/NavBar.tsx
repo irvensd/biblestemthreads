@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/#first-drop", label: "Shop" },
   { href: "/#mission", label: "Mission" },
-  { href: "/#about", label: "About" },
+  { href: "/about", label: "About" },
 ];
 
 export function NavBar() {
@@ -32,8 +32,10 @@ export function NavBar() {
               key={link.label}
               href={link.href}
               className={cn(
-                "rounded-lg px-3 py-2 text-sm text-muted transition hover:text-ink",
-                pathname === "/" && "hover:bg-surface"
+                "rounded-lg px-3 py-2 text-sm transition hover:text-ink",
+                link.href === "/about" && pathname === "/about"
+                  ? "font-medium text-ink"
+                  : "text-muted hover:bg-surface"
               )}
             >
               {link.label}
@@ -71,7 +73,12 @@ export function NavBar() {
           <Link
             key={link.label}
             href={link.href}
-            className="whitespace-nowrap rounded-lg px-3 py-1.5 text-sm text-muted transition hover:bg-surface hover:text-ink"
+            className={cn(
+              "whitespace-nowrap rounded-lg px-3 py-1.5 text-sm transition hover:bg-surface hover:text-ink",
+              link.href === "/about" && pathname === "/about"
+                ? "font-medium text-ink"
+                : "text-muted"
+            )}
           >
             {link.label}
           </Link>

@@ -3,7 +3,7 @@ import Link from "next/link";
 const footerLinks = [
   { href: "/#first-drop", label: "Shop" },
   { href: "/#mission", label: "Mission" },
-  { href: "/#about", label: "About" },
+  { href: "/about", label: "About" },
   { href: "https://biblestem.io", label: "BibleStem Studies", external: true },
   { href: "https://biblestem.io/donate", label: "Donate", external: true },
 ];
