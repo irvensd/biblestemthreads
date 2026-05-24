@@ -10,6 +10,16 @@ export const featuredProduct: Product = {
   description:
     "A premium heavyweight black tee designed around the truth that God sees, knows, and remembers His people.",
   image: "/products/seen-by-god-lineup.png",
+  gallery: [
+    {
+      src: "/products/seen-by-god-lineup.png",
+      alt: "Seen By God oversized tee product collage",
+    },
+    {
+      src: "/products/seen_by_god_selected_2_3_5_7_collage.png",
+      alt: "Seen By God tee worn and detail views",
+    },
+  ],
   sizes: ["S", "M", "L", "XL", "XXL"],
   details: [
     "Heavyweight cotton",

@@ -1,3 +1,8 @@
+export type ProductImage = {
+  src: string;
+  alt: string;
+};
+
 export type Product = {
   id: string;
   name: string;
@@ -7,6 +12,7 @@ export type Product = {
   description: string;
   scripture?: string;
   image: string;
+  gallery: ProductImage[];
   sizes: string[];
   details: string[];
   inStock: boolean;

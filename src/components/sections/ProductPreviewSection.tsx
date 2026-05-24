@@ -21,6 +21,7 @@ export function ProductPreviewSection() {
             <ProductImageViewer
               src={featuredProduct.image}
               alt={featuredProduct.name}
+              images={featuredProduct.gallery}
               sizes="(min-width: 1024px) 560px, 100vw"
             />
           </div>
