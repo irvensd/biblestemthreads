@@ -27,7 +27,7 @@ export function HeroSection() {
 
         <ProductImageViewer
           src={featuredProduct.image}
-          alt="Seen By God oversized tee lineup"
+          alt="Seen By God oversized tee product collage"
           priority
           sizes="(min-width: 1024px) 560px, 100vw"
         />

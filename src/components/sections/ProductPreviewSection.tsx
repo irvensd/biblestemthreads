@@ -3,7 +3,7 @@ import { ProductImageViewer } from "@/components/ProductImageViewer";
 import { featuredProduct } from "@/data/products";
 
 const productBullets = [
-  "Oversized fit",
+  "Unisex oversized fit",
   "Heavyweight cotton",
   "Front chest print",
   "Large back print",

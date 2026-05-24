@@ -13,7 +13,7 @@ export const featuredProduct: Product = {
   sizes: ["S", "M", "L", "XL", "XXL"],
   details: [
     "Heavyweight cotton",
-    "Oversized fit",
+    "Unisex oversized fit",
     "Front chest print",
     "Back statement print",
     "Sleeve detail",

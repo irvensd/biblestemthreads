@@ -22,7 +22,7 @@ export function ProductImageViewer({
   alt,
   priority = false,
   sizes = "(min-width: 1024px) 560px, 100vw",
-  aspectClassName = "aspect-[4/5]",
+  aspectClassName = "aspect-[5/4]",
   className,
   imageClassName,
 }: ProductImageViewerProps) {
@@ -181,7 +181,7 @@ export function ProductImageViewer({
           priority={priority}
           sizes={sizes}
           className={cn(
-            "object-cover transition-transform duration-500 group-hover:scale-[1.03]",
+            "object-contain transition-transform duration-500 group-hover:scale-[1.03]",
             imageClassName
           )}
         />

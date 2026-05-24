@@ -22,7 +22,7 @@ export function FirstDropSection() {
           <ProductImageViewer
             src={featuredProduct.image}
             alt={featuredProduct.name}
-            aspectClassName="aspect-square md:aspect-auto md:min-h-[420px]"
+            aspectClassName="aspect-[5/4] md:aspect-auto md:min-h-[420px]"
             sizes="(min-width: 768px) 50vw, 100vw"
             className="rounded-none border-0 md:rounded-none"
           />

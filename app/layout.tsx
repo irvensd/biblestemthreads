@@ -24,8 +24,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/products/seen-by-god-lineup.png",
-        width: 1200,
-        height: 1200,
+        width: 1402,
+        height: 1122,
         alt: "Seen By God oversized tee by BibleStem Threads",
       },
     ],
