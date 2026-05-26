@@ -4,7 +4,7 @@ export const featuredProduct: Product = {
   id: "seen-by-god-oversized-tee",
   name: "Seen By God Oversized Tee",
   slug: "seen-by-god-oversized-tee",
-  price: 44,
+  price: 37,
   category: "Tees",
   scripture: "Genesis 16:13",
   description:
